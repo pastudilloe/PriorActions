@@ -47,7 +47,7 @@
     <h1>Classification Feedback Interface</h1>
     <p>
       Use the file input below to load your existing classification results JSON file.
-      Then, review each operation’s classification, provide a vote and feedback, and finally download your feedback.
+      Then, review each operation’s classification, provide a vote and feedback, and finally download or save your feedback.
     </p>
     <div class="section">
       <input type="file" id="fileInput" accept=".json">
@@ -59,6 +59,7 @@
         <button id="prevBtn">Previous</button>
         <button id="nextBtn">Next</button>
         <button id="downloadBtn">Download Feedback</button>
+        <button id="saveGitHubBtn">Save to GitHub</button>
       </div>
     </div>
   </div>
@@ -112,7 +113,7 @@
               }
             }
             feedbackResults[key] = {
-              accuracy: "", // will store "yes" or "no"
+              accuracy: "",
               policy_feedback: policyFeedback,
               overall_comment: ""
             };
@@ -273,7 +274,7 @@
       overallDiv.appendChild(overallArea);
       container.appendChild(overallDiv);
 
-      // Display current document index
+      // Display current operation index
       const indexDisplay = document.createElement("p");
       indexDisplay.innerHTML = `<em>Operation ${index + 1} of ${docKeys.length}</em>`;
       container.appendChild(indexDisplay);
@@ -302,6 +303,50 @@
       downloadAnchorNode.click();
       downloadAnchorNode.remove();
     });
+
+    // Save the feedback JSON to GitHub using the GitHub API.
+    document.getElementById("saveGitHubBtn").addEventListener("click", function() {
+      saveToGithub();
+    });
+
+    async function saveToGithub() {
+      // Replace with your GitHub details and token.
+      const token = 'YOUR_GITHUB_TOKEN';
+      const owner = 'YOUR_GITHUB_USERNAME';
+      const repo = 'YOUR_REPOSITORY_NAME';
+      const path = 'human_feedback.json';  // Path and name of the file in your repo.
+      const commitMessage = 'Upload human feedback';
+      const branch = 'main';  // Change if your default branch is different.
+
+      // Encode content in base64.
+      const content = btoa(JSON.stringify(feedbackResults, null, 2));
+      const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+
+      // Data payload for the PUT request.
+      const data = {
+        message: commitMessage,
+        content: content,
+        branch: branch
+      };
+
+      try {
+        const response = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'token ' + token
+          },
+          body: JSON.stringify(data)
+        });
+        if (!response.ok) {
+          throw new Error('Failed to save file to GitHub: ' + (await response.text()));
+        }
+        const result = await response.json();
+        alert('File saved to GitHub at: ' + result.content.html_url);
+      } catch (error) {
+        alert('Error: ' + error);
+      }
+    }
   </script>
 </body>
 </html>
