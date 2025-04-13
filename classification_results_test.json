@@ -1,0 +1,111 @@
+{
+  ".txt": {
+    "matched_topic": "Financial sector development",
+    "policy_scores": {
+      "Improving access to education": 0.1,
+      "Enhancing education quality": 0.2,
+      "Fostering labor market transitions": 0.3,
+      "Access to quality care": 0.4,
+      "Food security and maternal and child nutrition services": 0.2,
+      "Environmental health determinants and pollution": 0.1
+    },
+    "evidence": {
+      "Improving access to education": [],
+      "Enhancing education quality": [],
+      "Fostering labor market transitions": [],
+      "Access to quality care": [
+        "develop instrument support policy reform health system essential improve productive capacity populat..."
+      ],
+      "Food security and maternal and child nutrition services": [],
+      "Environmental health determinants and pollution": []
+    },
+    "explanation": "The report primarily focuses on financial sector development and capital markets practices, with a specific emphasis on advisory services and peer group dialogue related to debt markets. While the report does mention global financial crisis and policy challenges faced by bond markets, there is no direct evidence linking it to education, health, or nutrition policies. The excerpt mentioning 'develop instrument support policy reform health system essential improve productive capacity populat...' indicates a slight relevance to the 'Access to quality care' policy area, hence a score of 0.4 is assigned. However, the report lacks substantial evidence to support a strong relation to any specific education, health, or nutrition policy areas.",
+    "Operation ID": "P_UNKNOWN",
+    "File Name": "",
+    "description": "The document discusses the Gemloc Advisory Services Peer Group Dialogue, a series of virtual forums facilitated by the Chief of Gemloc Advisory Services to allow policy makers and economists to share experiences and expertise on debt market-related issues. The dialogue aims to address policy challenges and integrity issues faced by emerging bond markets, particularly in the context of the global financial crisis. The peer groups focus on various financial sector topics such as capital markets, corporate governance, government bond market development, and non-bank financial institutions, with participation from countries like Brazil, China, India, Mexico, and others."
+  },
+  "ID_P107741_44611.txt": {
+    "matched_topic": "Education",
+    "policy_scores": {
+      "Improving access to education": 0.2,
+      "Enhancing education quality": 0.1,
+      "Fostering labor market transitions": 0.3
+    },
+    "evidence": {
+      "Improving access to education": [],
+      "Enhancing education quality": [],
+      "Fostering labor market transitions": []
+    },
+    "explanation": "The report does not provide direct evidence related to any specific policy area within the Education topic. The content mainly focuses on financial and administrative aspects of a development program in Niger, lacking explicit mentions or connections to education-related policies.",
+    "Operation ID": "P107741",
+    "File Name": "44611",
+    "description": "The document is a World Bank official report proposing a growth policy reform grant for the Republic of Niger. The grant amount is SDR 26.5 million (equivalent to US$40 million) and was proposed on February 27, 2009. The document outlines various abbreviations and acronyms related to the program, as well as details on the country's financial and economic landscape. It also includes information on key stakeholders and institutions involved in the development and implementation of the grant."
+  },
+  "ID_P108489_43361.txt": {
+    "matched_topic": "Education",
+    "policy_scores": {
+      "Improving access to education": 0.2,
+      "Enhancing education quality": 0.4,
+      "Fostering labor market transitions": 0.1
+    },
+    "evidence": {
+      "Improving access to education": [],
+      "Enhancing education quality": [
+        "indian statistical system gaps identify major reforms begun track"
+      ],
+      "Fostering labor market transitions": []
+    },
+    "explanation": "The report is most related to the 'Education' topic, specifically focusing on enhancing education quality. The evidence provided in the report mentions the identification of gaps in the Indian statistical system and the initiation of major reforms to address them. This aligns with the policy area of enhancing education quality, as improving the statistical system is crucial for monitoring and improving educational outcomes. However, the report does not directly address improving access to education or fostering labor market transitions, hence the low scores assigned to those policy areas.",
+    "Operation ID": "P108489",
+    "File Name": "43361",
+    "description": "The document is a World Bank official report on a proposed loan of US$107 million to the Republic of India for statistical strengthening. It includes details on the loan agreement, key personnel involved, and the purpose of the loan to improve the national statistical system in India. The report outlines the gaps in the current statistical system, ongoing reforms, and areas for improvement to enhance the quality and credibility of statistics generated by the states."
+  },
+  "ID_P_UNKNOWN_.txt": {
+    "matched_topic": "Financial sector development",
+    "policy_scores": {
+      "Improving access to education": 0.1,
+      "Enhancing education quality": 0.2,
+      "Fostering labor market transitions": 0.3,
+      "Access to quality care": 0.1,
+      "Food security and maternal and child nutrition services": 0.1,
+      "Environmental health determinants and pollution": 0.1
+    },
+    "evidence": {
+      "Improving access to education": [],
+      "Enhancing education quality": [],
+      "Fostering labor market transitions": [],
+      "Access to quality care": [],
+      "Food security and maternal and child nutrition services": [],
+      "Environmental health determinants and pollution": []
+    },
+    "explanation": "The report does not contain clear evidence directly related to any of the provided policy areas on education, health, or nutrition. The content primarily focuses on financial sector development, specifically on topics related to capital markets, corporate bond markets, and peer group dialogues within the financial systems. Therefore, the relevance to education, health, and nutrition policy areas is minimal, resulting in low similarity scores across all categories.",
+    "Operation ID": "P_UNKNOWN",
+    "File Name": "",
+    "description": "The document discusses the Gemloc Advisory Services Peer Group Dialogue, a series of virtual forums facilitated by the Chief of Gemloc Advisory Services to allow policy makers and economists to share experiences and expertise on debt market-related issues. The dialogue aims to address policy challenges and integrity issues faced by emerging bond markets, particularly in the context of the global financial crisis. The peer groups cover various topics such as financial inclusion, infrastructure, and capital markets development, with representatives from different countries participating in discussions and sharing best practices."
+  },
+  "ID_P101471_44351.txt": {
+    "matched_topic": "Health and nutrition",
+    "policy_scores": {
+      "Access to quality care": 0.8,
+      "Food security and maternal and child nutrition services": 0.6,
+      "Environmental health determinants and pollution": 0.4
+    },
+    "evidence": {
+      "Access to quality care": [
+        "develop instrument support policy reform health system essential improve productive capacity populat..."
+      ],
+      "Food security and maternal and child nutrition services": [
+        "food security nutrition intervention directly impact human capital formation economic productivity p..."
+      ],
+      "Environmental health determinants and pollution": []
+    },
+    "explanation": {
+      "Access to quality care": "The report mentions the need for policy reform in the health system to improve the productive capacity of the population, which aligns with the goal of enhancing access to quality care. This is a strong indicator of relevance, hence the high score.",
+      "Food security and maternal and child nutrition services": "The report directly references the impact of food security and nutrition interventions on human capital formation and economic productivity, which falls under the policy area of food security and maternal and child nutrition services. While the mention is not extensive, it still provides clear evidence of relevance.",
+      "Environmental health determinants and pollution": "There is no direct evidence in the report related to environmental health determinants and pollution. As a result, the score is lower as there is no clear indication of relevance to this policy area."
+    },
+    "Operation ID": "P101471",
+    "File Name": "44351",
+    "description": "The document is a World Bank official report proposing an environmental development policy loan of US$330 million to the Republic of Peru on January 7, 2009. The loan is intended to support sustainable development efforts in Peru, focusing on environmental quality standards, environmental impact assessments, and other related initiatives. The document outlines various abbreviations and acronyms related to the loan program and provides details on the financial aspects and exchange rates involved."
+  }
+}
