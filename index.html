@@ -46,20 +46,15 @@
   <div class="container">
     <h1>Classification Feedback Interface</h1>
     <p>
-      Use the file input below to load your existing classification results JSON file.
-      Then, review each operation’s classification, provide a vote and feedback, and finally download or save your feedback.
+      Classification results are loaded automatically from GitHub. Review each operation’s classification, provide a vote and feedback, and then download your feedback.
     </p>
-    <div class="section">
-      <input type="file" id="fileInput" accept=".json">
-      <button id="loadBtn">Load Classification Results</button>
-    </div>
+    <!-- Review container is hidden until data is loaded -->
     <div id="reviewContainer" style="display:none;">
       <div id="docDisplay" class="document"></div>
       <div>
         <button id="prevBtn">Previous</button>
         <button id="nextBtn">Next</button>
         <button id="downloadBtn">Download Feedback</button>
-        <button id="saveGitHubBtn">Save to GitHub</button>
       </div>
     </div>
   </div>
@@ -82,17 +77,19 @@
       return result;
     }
 
-    // Load classification JSON file when button is clicked.
-    document.getElementById("loadBtn").addEventListener("click", function () {
-      const fileInput = document.getElementById("fileInput");
-      if (!fileInput.files[0]) {
-        alert("Please select a JSON file.");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        try {
-          classificationResults = JSON.parse(e.target.result);
+    // Automatically load classification JSON from GitHub when the page loads.
+    window.addEventListener("load", function() {
+      // Replace the URL below with your actual GitHub raw URL.
+      const githubUrl = "https://raw.githubusercontent.com/pastudilloe/PriorActions/refs/heads/main/classification_results_test.json";
+      fetch(githubUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then(data => {
+          classificationResults = data;
           const allKeys = Object.keys(classificationResults);
           // Randomly select 1/4 of all keys for feedback.
           docKeys = getRandomSample(allKeys, 0.25);
@@ -113,7 +110,7 @@
               }
             }
             feedbackResults[key] = {
-              accuracy: "",
+              accuracy: "", // will store "yes" or "no"
               policy_feedback: policyFeedback,
               overall_comment: ""
             };
@@ -121,18 +118,18 @@
           currentIndex = 0;
           displayDocument(currentIndex);
           document.getElementById("reviewContainer").style.display = "block";
-        } catch (error) {
-          alert("Error parsing JSON file.");
-        }
-      };
-      reader.readAsText(fileInput.files[0]);
+        })
+        .catch(error => {
+          alert("Failed to load classification data from GitHub.");
+          console.error("Error fetching the JSON file:", error);
+        });
     });
 
     function displayDocument(index) {
       const docId = docKeys[index];
       const result = classificationResults[docId];
       const container = document.getElementById("docDisplay");
-      container.innerHTML = ""; // clear previous content
+      container.innerHTML = ""; // Clear previous content
 
       // Operation ID header (using bracket notation to access keys with spaces)
       const opIdHeader = document.createElement("h2");
@@ -274,7 +271,7 @@
       overallDiv.appendChild(overallArea);
       container.appendChild(overallDiv);
 
-      // Display current operation index
+      // Display current document index
       const indexDisplay = document.createElement("p");
       indexDisplay.innerHTML = `<em>Operation ${index + 1} of ${docKeys.length}</em>`;
       container.appendChild(indexDisplay);
@@ -299,54 +296,10 @@
       const downloadAnchorNode = document.createElement("a");
       downloadAnchorNode.setAttribute("href", dataStr);
       downloadAnchorNode.setAttribute("download", "human_feedback.json");
-      document.body.appendChild(downloadAnchorNode); // required for firefox
+      document.body.appendChild(downloadAnchorNode); // Required for Firefox
       downloadAnchorNode.click();
       downloadAnchorNode.remove();
     });
-
-    // Save the feedback JSON to GitHub using the GitHub API.
-    document.getElementById("saveGitHubBtn").addEventListener("click", function() {
-      saveToGithub();
-    });
-
-    async function saveToGithub() {
-      // Replace with your GitHub details and token.
-      const token = 'YOUR_GITHUB_TOKEN';
-      const owner = 'YOUR_GITHUB_USERNAME';
-      const repo = 'YOUR_REPOSITORY_NAME';
-      const path = 'human_feedback.json';  // Path and name of the file in your repo.
-      const commitMessage = 'Upload human feedback';
-      const branch = 'main';  // Change if your default branch is different.
-
-      // Encode content in base64.
-      const content = btoa(JSON.stringify(feedbackResults, null, 2));
-      const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-
-      // Data payload for the PUT request.
-      const data = {
-        message: commitMessage,
-        content: content,
-        branch: branch
-      };
-
-      try {
-        const response = await fetch(url, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'token ' + token
-          },
-          body: JSON.stringify(data)
-        });
-        if (!response.ok) {
-          throw new Error('Failed to save file to GitHub: ' + (await response.text()));
-        }
-        const result = await response.json();
-        alert('File saved to GitHub at: ' + result.content.html_url);
-      } catch (error) {
-        alert('Error: ' + error);
-      }
-    }
   </script>
 </body>
 </html>
