@@ -48,7 +48,6 @@
     <p>
       Classification results are loaded automatically from GitHub. Review each operation’s classification, provide a vote and feedback, and then download your feedback.
     </p>
-    <!-- Review container is hidden until data is loaded -->
     <div id="reviewContainer" style="display:none;">
       <div id="docDisplay" class="document"></div>
       <div>
@@ -65,7 +64,6 @@
     let docKeys = [];
     let currentIndex = 0;
 
-    // Function to pick a random sample of items from an array.
     function getRandomSample(array, fraction) {
       const sampleSize = Math.ceil(array.length * fraction);
       const copy = array.slice();
@@ -77,27 +75,22 @@
       return result;
     }
 
-    // Automatically load classification JSON from GitHub when the page loads.
     window.addEventListener("load", function() {
-      // Replace the URL below with your actual GitHub raw URL.
-      const githubUrl = "https://raw.githubusercontent.com/pastudilloe/PriorActions/refs/heads/main/classification_results_test.json";
+      const githubUrl = "https://raw.githubusercontent.com/pastudilloe/PriorActions/refs/heads/main/classification_results_test2.json";
       fetch(githubUrl)
         .then(response => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
+          if (!response.ok) throw new Error("Network response was not ok");
           return response.json();
         })
         .then(data => {
           classificationResults = data;
           const allKeys = Object.keys(classificationResults);
-          // Randomly select 1/4 of all keys for feedback.
-          docKeys = getRandomSample(allKeys, 0.25);
-          if (docKeys.length === 0) {
+          docKeys = getRandomSample(allKeys, 0.10);
+          if (!docKeys.length) {
             alert("No documents found in JSON.");
             return;
           }
-          // Initialize feedback results with defaults.
+
           docKeys.forEach(key => {
             const result = classificationResults[key];
             let policyFeedback = {};
@@ -110,18 +103,19 @@
               }
             }
             feedbackResults[key] = {
-              accuracy: "", // will store "yes" or "no"
+              accuracy: "",
               policy_feedback: policyFeedback,
               overall_comment: ""
             };
           });
+
           currentIndex = 0;
           displayDocument(currentIndex);
           document.getElementById("reviewContainer").style.display = "block";
         })
         .catch(error => {
           alert("Failed to load classification data from GitHub.");
-          console.error("Error fetching the JSON file:", error);
+          console.error(error);
         });
     });
 
@@ -129,176 +123,154 @@
       const docId = docKeys[index];
       const result = classificationResults[docId];
       const container = document.getElementById("docDisplay");
-      container.innerHTML = ""; // Clear previous content
+      container.innerHTML = "";
 
-      // Operation ID header (using bracket notation to access keys with spaces)
-      const opIdHeader = document.createElement("h2");
+      // Project Name
+      const projHeader = document.createElement("h2");
+      projHeader.textContent = "Project Name: " + (result["Project Name"] || "N/A");
+      container.appendChild(projHeader);
+
+      // Operation ID
+      const opIdHeader = document.createElement("h3");
       opIdHeader.textContent = "Operation ID: " + (result["Operation ID"] || "N/A");
       container.appendChild(opIdHeader);
 
-      // File Name header (using bracket notation)
+      // Link
+      const linkPara = document.createElement("p");
+      const linkValue = result["Link"] || "";
+      if (linkValue) {
+        linkPara.innerHTML = `Link: <a href="${linkValue}" target="_blank">${linkValue}</a>`;
+      } else {
+        linkPara.textContent = "Link: N/A";
+      }
+      container.appendChild(linkPara);
+
+      // File Name
       const fileNameHeader = document.createElement("h3");
       fileNameHeader.textContent = "File Name: " + (result["File Name"] || "N/A");
       container.appendChild(fileNameHeader);
 
-      // Description section
+      // Description
       const descriptionDiv = document.createElement("div");
       descriptionDiv.className = "section";
-      const descriptionLabel = document.createElement("label");
-      descriptionLabel.textContent = "Description:";
-      descriptionDiv.appendChild(descriptionLabel);
-      const descriptionPara = document.createElement("p");
-      descriptionPara.textContent = result.description || "No description provided.";
-      descriptionDiv.appendChild(descriptionPara);
+      descriptionDiv.innerHTML = `
+        <label>Description:</label>
+        <p>${result.description || "No description provided."}</p>
+      `;
       container.appendChild(descriptionDiv);
 
-      // Overall explanation section
-      const explanationDiv = document.createElement("div");
-      explanationDiv.className = "section";
-      const explLabel = document.createElement("label");
-      explLabel.textContent = "Overall Explanation:";
-      explanationDiv.appendChild(explLabel);
-      const explPara = document.createElement("p");
-      explPara.textContent = result.explanation || "No explanation provided.";
-      explanationDiv.appendChild(explPara);
-      container.appendChild(explanationDiv);
+      // Explanation
+      const explDiv = document.createElement("div");
+      explDiv.className = "section";
+      explDiv.innerHTML = `
+        <label>Overall Explanation:</label>
+        <p>${result.explanation || "No explanation provided."}</p>
+      `;
+      container.appendChild(explDiv);
 
       // Accuracy vote
       const voteDiv = document.createElement("div");
       voteDiv.className = "section";
-      const voteLabel = document.createElement("label");
-      voteLabel.textContent = "Is the classification accurate?";
-      voteDiv.appendChild(voteLabel);
-      const voteSelect = document.createElement("select");
-      voteSelect.id = "voteSelect";
-      const optionDefault = document.createElement("option");
-      optionDefault.value = "";
-      optionDefault.textContent = "Select...";
-      voteSelect.appendChild(optionDefault);
-      const optionYes = document.createElement("option");
-      optionYes.value = "yes";
-      optionYes.textContent = "Yes";
-      voteSelect.appendChild(optionYes);
-      const optionNo = document.createElement("option");
-      optionNo.value = "no";
-      optionNo.textContent = "No";
-      voteSelect.appendChild(optionNo);
-      // Set current value if already provided
+      voteDiv.innerHTML = `
+        <label>Is the classification accurate?</label>
+        <select id="voteSelect">
+          <option value="">Select...</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      `;
+      const voteSelect = voteDiv.querySelector("select");
       voteSelect.value = feedbackResults[docId].accuracy;
-      voteSelect.addEventListener("change", function() {
+      voteSelect.addEventListener("change", () => {
         feedbackResults[docId].accuracy = voteSelect.value;
       });
-      voteDiv.appendChild(voteSelect);
       container.appendChild(voteDiv);
 
-      // Policy areas feedback section
+      // Policy areas
       const policyDiv = document.createElement("div");
       policyDiv.className = "section";
-      const policyHeader = document.createElement("h3");
-      policyHeader.textContent = "Policy Areas Feedback:";
-      policyDiv.appendChild(policyHeader);
-
+      policyDiv.innerHTML = `<h3>Policy Areas Feedback:</h3>`;
       if (result.policy_scores) {
         for (let area in result.policy_scores) {
           const areaDiv = document.createElement("div");
           areaDiv.className = "policy-area";
-          // Show policy area name, current score, and evidence
-          const areaTitle = document.createElement("h4");
-          areaTitle.textContent = area;
-          areaDiv.appendChild(areaTitle);
-          const scorePara = document.createElement("p");
-          scorePara.innerHTML = `<strong>Current Score:</strong> ${result.policy_scores[area]}`;
-          areaDiv.appendChild(scorePara);
-          const evidencePara = document.createElement("p");
-          evidencePara.innerHTML = `<strong>Evidence:</strong>`;
-          areaDiv.appendChild(evidencePara);
-          const evidenceList = document.createElement("ul");
-          if (result.evidence && result.evidence[area]) {
-            result.evidence[area].forEach(e => {
-              const li = document.createElement("li");
-              li.textContent = e;
-              evidenceList.appendChild(li);
-            });
-          } else {
+          areaDiv.innerHTML = `
+            <h4>${area}</h4>
+            <p><strong>Current Score:</strong> ${result.policy_scores[area]}</p>
+            <p><strong>Evidence:</strong></p>
+          `;
+          const ul = document.createElement("ul");
+          (result.evidence[area] || ["No evidence provided."]).forEach(e => {
             const li = document.createElement("li");
-            li.textContent = "No evidence provided.";
-            evidenceList.appendChild(li);
-          }
-          areaDiv.appendChild(evidenceList);
-
-          // Input for revised score
-          const revisedLabel = document.createElement("label");
-          revisedLabel.textContent = "Revised Score: ";
-          areaDiv.appendChild(revisedLabel);
-          const revisedInput = document.createElement("input");
-          revisedInput.type = "number";
-          revisedInput.min = 0;
-          revisedInput.max = 1;
-          revisedInput.step = 0.01;
-          revisedInput.value = feedbackResults[docId].policy_feedback[area].revised_score;
-          revisedInput.addEventListener("change", function() {
-            feedbackResults[docId].policy_feedback[area].revised_score = parseFloat(revisedInput.value);
+            li.textContent = e;
+            ul.appendChild(li);
           });
-          areaDiv.appendChild(revisedInput);
+          areaDiv.appendChild(ul);
 
-          // Textarea for comment
-          const commentLabel = document.createElement("label");
-          commentLabel.textContent = " Comments:";
-          areaDiv.appendChild(commentLabel);
-          const commentArea = document.createElement("textarea");
-          commentArea.value = feedbackResults[docId].policy_feedback[area].comment;
-          commentArea.addEventListener("input", function() {
-            feedbackResults[docId].policy_feedback[area].comment = commentArea.value;
+          // Revised score input
+          const revLabel = document.createElement("label");
+          revLabel.textContent = "Revised Score: ";
+          const revInput = document.createElement("input");
+          revInput.type = "number";
+          revInput.min = 0;
+          revInput.max = 1;
+          revInput.step = 0.01;
+          revInput.value = feedbackResults[docId].policy_feedback[area].revised_score;
+          revInput.addEventListener("change", () => {
+            feedbackResults[docId].policy_feedback[area].revised_score = parseFloat(revInput.value);
           });
-          areaDiv.appendChild(commentArea);
+          areaDiv.appendChild(revLabel);
+          areaDiv.appendChild(revInput);
+
+          // Comment textarea
+          const comLabel = document.createElement("label");
+          comLabel.textContent = " Comments:";
+          const comArea = document.createElement("textarea");
+          comArea.value = feedbackResults[docId].policy_feedback[area].comment;
+          comArea.addEventListener("input", () => {
+            feedbackResults[docId].policy_feedback[area].comment = comArea.value;
+          });
+          areaDiv.appendChild(comLabel);
+          areaDiv.appendChild(comArea);
 
           policyDiv.appendChild(areaDiv);
         }
       }
       container.appendChild(policyDiv);
 
-      // Overall comment section
+      // Overall comment
       const overallDiv = document.createElement("div");
       overallDiv.className = "section";
-      const overallLabel = document.createElement("label");
-      overallLabel.textContent = "Overall Comments:";
-      overallDiv.appendChild(overallLabel);
-      const overallArea = document.createElement("textarea");
-      overallArea.value = feedbackResults[docId].overall_comment;
-      overallArea.addEventListener("input", function() {
-        feedbackResults[docId].overall_comment = overallArea.value;
+      overallDiv.innerHTML = `
+        <label>Overall Comments:</label>
+        <textarea>${feedbackResults[docId].overall_comment}</textarea>
+      `;
+      overallDiv.querySelector("textarea").addEventListener("input", e => {
+        feedbackResults[docId].overall_comment = e.target.value;
       });
-      overallDiv.appendChild(overallArea);
       container.appendChild(overallDiv);
 
-      // Display current document index
-      const indexDisplay = document.createElement("p");
-      indexDisplay.innerHTML = `<em>Operation ${index + 1} of ${docKeys.length}</em>`;
-      container.appendChild(indexDisplay);
+      // Index display
+      const idx = document.createElement("p");
+      idx.innerHTML = `<em>Operation ${index+1} of ${docKeys.length}</em>`;
+      container.appendChild(idx);
     }
 
-    document.getElementById("prevBtn").addEventListener("click", function() {
-      if (currentIndex > 0) {
-        currentIndex--;
-        displayDocument(currentIndex);
-      }
+    document.getElementById("prevBtn").addEventListener("click", () => {
+      if (currentIndex > 0) displayDocument(--currentIndex);
     });
-    document.getElementById("nextBtn").addEventListener("click", function() {
-      if (currentIndex < docKeys.length - 1) {
-        currentIndex++;
-        displayDocument(currentIndex);
-      }
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      if (currentIndex < docKeys.length - 1) displayDocument(++currentIndex);
     });
 
-    // Download the feedback as a JSON file.
-    document.getElementById("downloadBtn").addEventListener("click", function() {
+    document.getElementById("downloadBtn").addEventListener("click", () => {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(feedbackResults, null, 2));
-      const downloadAnchorNode = document.createElement("a");
-      downloadAnchorNode.setAttribute("href", dataStr);
-      downloadAnchorNode.setAttribute("download", "human_feedback.json");
-      document.body.appendChild(downloadAnchorNode); // Required for Firefox
-      downloadAnchorNode.click();
-      downloadAnchorNode.remove();
+      const a = document.createElement("a");
+      a.setAttribute("href", dataStr);
+      a.setAttribute("download", "human_feedback.json");
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     });
   </script>
 </body>
