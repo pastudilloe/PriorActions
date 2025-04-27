@@ -48,7 +48,6 @@
     <p>
       Classification results are loaded automatically from GitHub. Review each operation’s classification, provide a vote and feedback, and then download your feedback.
     </p>
-    <!-- Review container is hidden until data is loaded -->
     <div id="reviewContainer" style="display:none;">
       <div id="docDisplay" class="document"></div>
       <div>
@@ -92,7 +91,6 @@
             return;
           }
 
-          // Initialize feedbackResults
           docKeys.forEach(key => {
             const result = classificationResults[key];
             let policyFeedback = {};
@@ -127,22 +125,24 @@
       const container = document.getElementById("docDisplay");
       container.innerHTML = "";
 
-      // Operation ID
-      const opIdHeader = document.createElement("h2");
-      opIdHeader.textContent = "Operation ID: " + (result["Operation ID"] || "N/A");
-      container.appendChild(opIdHeader);
-
       // Project Name
-      const projHeader = document.createElement("h3");
+      const projHeader = document.createElement("h2");
       projHeader.textContent = "Project Name: " + (result["Project Name"] || "N/A");
       container.appendChild(projHeader);
+
+      // Operation ID
+      const opIdHeader = document.createElement("h3");
+      opIdHeader.textContent = "Operation ID: " + (result["Operation ID"] || "N/A");
+      container.appendChild(opIdHeader);
 
       // Link
       const linkPara = document.createElement("p");
       const linkValue = result["Link"] || "";
-      linkPara.innerHTML = linkValue
-        ? `Link: <a href="${linkValue}" target="_blank">${linkValue}</a>`
-        : "Link: N/A";
+      if (linkValue) {
+        linkPara.innerHTML = `Link: <a href="${linkValue}" target="_blank">${linkValue}</a>`;
+      } else {
+        linkPara.textContent = "Link: N/A";
+      }
       container.appendChild(linkPara);
 
       // File Name
@@ -201,7 +201,9 @@
           `;
           const ul = document.createElement("ul");
           (result.evidence[area] || ["No evidence provided."]).forEach(e => {
-            const li = document.createElement("li"); li.textContent = e; ul.appendChild(li);
+            const li = document.createElement("li");
+            li.textContent = e;
+            ul.appendChild(li);
           });
           areaDiv.appendChild(ul);
 
@@ -209,7 +211,10 @@
           const revLabel = document.createElement("label");
           revLabel.textContent = "Revised Score: ";
           const revInput = document.createElement("input");
-          revInput.type = "number"; revInput.min = 0; revInput.max = 1; revInput.step = 0.01;
+          revInput.type = "number";
+          revInput.min = 0;
+          revInput.max = 1;
+          revInput.step = 0.01;
           revInput.value = feedbackResults[docId].policy_feedback[area].revised_score;
           revInput.addEventListener("change", () => {
             feedbackResults[docId].policy_feedback[area].revised_score = parseFloat(revInput.value);
@@ -227,6 +232,7 @@
           });
           areaDiv.appendChild(comLabel);
           areaDiv.appendChild(comArea);
+
           policyDiv.appendChild(areaDiv);
         }
       }
