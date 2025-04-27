@@ -85,7 +85,7 @@
         .then(data => {
           classificationResults = data;
           const allKeys = Object.keys(classificationResults);
-          docKeys = getRandomSample(allKeys, 0.11);
+          docKeys = getRandomSample(allKeys, 0.10);
           if (!docKeys.length) {
             alert("No documents found in JSON.");
             return;
