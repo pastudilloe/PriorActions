@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Classification Feedback Interface</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+    .document {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .section {
+      margin-bottom: 15px;
+    }
+    .policy-area {
+      margin-left: 20px;
+      margin-bottom: 10px;
+      padding: 8px;
+      border: 1px dashed #aaa;
+    }
+    label {
+      font-weight: bold;
+    }
+    input[type="number"] {
+      width: 60px;
+    }
+    textarea {
+      width: 100%;
+      height: 50px;
+    }
+    button {
+      margin: 5px;
+      padding: 10px 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Classification Feedback Interface</h1>
+    <p>
+      Classification results are loaded automatically from GitHub. Review each operation’s classification, provide a vote and feedback, and then download your feedback.
+    </p>
+    <!-- Review container is hidden until data is loaded -->
+    <div id="reviewContainer" style="display:none;">
+      <div id="docDisplay" class="document"></div>
+      <div>
+        <button id="prevBtn">Previous</button>
+        <button id="nextBtn">Next</button>
+        <button id="downloadBtn">Download Feedback</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let classificationResults = {};
+    let feedbackResults = {};
+    let docKeys = [];
+    let currentIndex = 0;
+
+    function getRandomSample(array, fraction) {
+      const sampleSize = Math.ceil(array.length * fraction);
+      const copy = array.slice();
+      const result = [];
+      for (let i = 0; i < sampleSize; i++) {
+        const randomIndex = Math.floor(Math.random() * copy.length);
+        result.push(copy.splice(randomIndex, 1)[0]);
+      }
+      return result;
+    }
+
+    window.addEventListener("load", function() {
+      const githubUrl = "https://raw.githubusercontent.com/pastudilloe/PriorActions/refs/heads/main/classification_results_test2.json";
+      fetch(githubUrl)
+        .then(response => {
+          if (!response.ok) throw new Error("Network response was not ok");
+          return response.json();
+        })
+        .then(data => {
+          classificationResults = data;
+          const allKeys = Object.keys(classificationResults);
+          docKeys = getRandomSample(allKeys, 0.25);
+          if (!docKeys.length) {
+            alert("No documents found in JSON.");
+            return;
+          }
+
+          // Initialize feedbackResults
+          docKeys.forEach(key => {
+            const result = classificationResults[key];
+            let policyFeedback = {};
+            if (result.policy_scores) {
+              for (let area in result.policy_scores) {
+                policyFeedback[area] = {
+                  revised_score: result.policy_scores[area],
+                  comment: ""
+                };
+              }
+            }
+            feedbackResults[key] = {
+              accuracy: "",
+              policy_feedback: policyFeedback,
+              overall_comment: ""
+            };
+          });
+
+          currentIndex = 0;
+          displayDocument(currentIndex);
+          document.getElementById("reviewContainer").style.display = "block";
+        })
+        .catch(error => {
+          alert("Failed to load classification data from GitHub.");
+          console.error(error);
+        });
+    });
+
+    function displayDocument(index) {
+      const docId = docKeys[index];
+      const result = classificationResults[docId];
+      const container = document.getElementById("docDisplay");
+      container.innerHTML = "";
+
+      // Operation ID
+      const opIdHeader = document.createElement("h2");
+      opIdHeader.textContent = "Operation ID: " + (result["Operation ID"] || "N/A");
+      container.appendChild(opIdHeader);
+
+      // Project Name
+      const projHeader = document.createElement("h3");
+      projHeader.textContent = "Project Name: " + (result["Project Name"] || "N/A");
+      container.appendChild(projHeader);
+
+      // Link
+      const linkPara = document.createElement("p");
+      const linkValue = result["Link"] || "";
+      linkPara.innerHTML = linkValue
+        ? `Link: <a href="${linkValue}" target="_blank">${linkValue}</a>`
+        : "Link: N/A";
+      container.appendChild(linkPara);
+
+      // File Name
+      const fileNameHeader = document.createElement("h3");
+      fileNameHeader.textContent = "File Name: " + (result["File Name"] || "N/A");
+      container.appendChild(fileNameHeader);
+
+      // Description
+      const descriptionDiv = document.createElement("div");
+      descriptionDiv.className = "section";
+      descriptionDiv.innerHTML = `
+        <label>Description:</label>
+        <p>${result.description || "No description provided."}</p>
+      `;
+      container.appendChild(descriptionDiv);
+
+      // Explanation
+      const explDiv = document.createElement("div");
+      explDiv.className = "section";
+      explDiv.innerHTML = `
+        <label>Overall Explanation:</label>
+        <p>${result.explanation || "No explanation provided."}</p>
+      `;
+      container.appendChild(explDiv);
+
+      // Accuracy vote
+      const voteDiv = document.createElement("div");
+      voteDiv.className = "section";
+      voteDiv.innerHTML = `
+        <label>Is the classification accurate?</label>
+        <select id="voteSelect">
+          <option value="">Select...</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      `;
+      const voteSelect = voteDiv.querySelector("select");
+      voteSelect.value = feedbackResults[docId].accuracy;
+      voteSelect.addEventListener("change", () => {
+        feedbackResults[docId].accuracy = voteSelect.value;
+      });
+      container.appendChild(voteDiv);
+
+      // Policy areas
+      const policyDiv = document.createElement("div");
+      policyDiv.className = "section";
+      policyDiv.innerHTML = `<h3>Policy Areas Feedback:</h3>`;
+      if (result.policy_scores) {
+        for (let area in result.policy_scores) {
+          const areaDiv = document.createElement("div");
+          areaDiv.className = "policy-area";
+          areaDiv.innerHTML = `
+            <h4>${area}</h4>
+            <p><strong>Current Score:</strong> ${result.policy_scores[area]}</p>
+            <p><strong>Evidence:</strong></p>
+          `;
+          const ul = document.createElement("ul");
+          (result.evidence[area] || ["No evidence provided."]).forEach(e => {
+            const li = document.createElement("li"); li.textContent = e; ul.appendChild(li);
+          });
+          areaDiv.appendChild(ul);
+
+          // Revised score input
+          const revLabel = document.createElement("label");
+          revLabel.textContent = "Revised Score: ";
+          const revInput = document.createElement("input");
+          revInput.type = "number"; revInput.min = 0; revInput.max = 1; revInput.step = 0.01;
+          revInput.value = feedbackResults[docId].policy_feedback[area].revised_score;
+          revInput.addEventListener("change", () => {
+            feedbackResults[docId].policy_feedback[area].revised_score = parseFloat(revInput.value);
+          });
+          areaDiv.appendChild(revLabel);
+          areaDiv.appendChild(revInput);
+
+          // Comment textarea
+          const comLabel = document.createElement("label");
+          comLabel.textContent = " Comments:";
+          const comArea = document.createElement("textarea");
+          comArea.value = feedbackResults[docId].policy_feedback[area].comment;
+          comArea.addEventListener("input", () => {
+            feedbackResults[docId].policy_feedback[area].comment = comArea.value;
+          });
+          areaDiv.appendChild(comLabel);
+          areaDiv.appendChild(comArea);
+          policyDiv.appendChild(areaDiv);
+        }
+      }
+      container.appendChild(policyDiv);
+
+      // Overall comment
+      const overallDiv = document.createElement("div");
+      overallDiv.className = "section";
+      overallDiv.innerHTML = `
+        <label>Overall Comments:</label>
+        <textarea>${feedbackResults[docId].overall_comment}</textarea>
+      `;
+      overallDiv.querySelector("textarea").addEventListener("input", e => {
+        feedbackResults[docId].overall_comment = e.target.value;
+      });
+      container.appendChild(overallDiv);
+
+      // Index display
+      const idx = document.createElement("p");
+      idx.innerHTML = `<em>Operation ${index+1} of ${docKeys.length}</em>`;
+      container.appendChild(idx);
+    }
+
+    document.getElementById("prevBtn").addEventListener("click", () => {
+      if (currentIndex > 0) displayDocument(--currentIndex);
+    });
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      if (currentIndex < docKeys.length - 1) displayDocument(++currentIndex);
+    });
+
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(feedbackResults, null, 2));
+      const a = document.createElement("a");
+      a.setAttribute("href", dataStr);
+      a.setAttribute("download", "human_feedback.json");
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+  </script>
+</body>
+</html>
