@@ -1,6 +1,6 @@
 # World Bank Document Analysis Pipeline
 
-This repository contains a series of scripts for scraping, processing, and analyzing World Bank documents using natural language processing and AI classification techniques. :contentReference[oaicite:0]{index=0}&#8203;:contentReference[oaicite:1]{index=1}
+This repository contains a series of scripts for scraping, processing, and analyzing World Bank documents using natural language processing and AI classification techniques. 
 
 ## Pipeline Overview
 
@@ -9,7 +9,7 @@ The workflow consists of four main stages:
 1. **Data Collection:** Scraping document metadata from the World Bank portal  
 2. **Text Extraction:** Downloading raw text content from documents  
 3. **Text Preprocessing:** Cleaning and preparing text data for analysis  
-4. **Policy Classification:** Using AI to classify documents by policy areas :contentReference[oaicite:2]{index=2}&#8203;:contentReference[oaicite:3]{index=3}
+4. **Policy Classification:** Using AI to classify documents by policy areas
 
 ## Scripts
 
@@ -19,7 +19,7 @@ The workflow consists of four main stages:
    Scrapes the World Bank documents portal using Selenium to:  
    - Paginate through document listings  
    - Extract metadata (project name, link, report number, etc.)  
-   - Export data to CSV for further processing :contentReference[oaicite:4]{index=4}&#8203;:contentReference[oaicite:5]{index=5}
+   - Export data to CSV for further processing
 
 2. **02_Retrieve_TXT.ipynb**  
    Processes the document URLs collected in the previous step:  
@@ -27,7 +27,7 @@ The workflow consists of four main stages:
    - Navigates to each detail page (handling pop-ups and alerts)  
    - Downloads raw text content  
    - Saves individual files (format: `Report_[ID]_RAW.txt`)  
-   - Logs any errors encountered during the process :contentReference[oaicite:6]{index=6}&#8203;:contentReference[oaicite:7]{index=7}
+   - Logs any errors encountered during the process
 
 3. **03_Pre_Process_TEXT.ipynb**  
    Prepares the raw text files for analysis:  
@@ -36,7 +36,7 @@ The workflow consists of four main stages:
    - Tokenizes and lemmatizes text using spaCy  
    - Removes stopwords and punctuation  
    - Extracts operation IDs via regex  
-   - Writes cleaned texts to disk (format: `ID_P[ProjectID]_[ReportID].txt`) :contentReference[oaicite:8]{index=8}&#8203;:contentReference[oaicite:9]{index=9}
+   - Writes cleaned texts to disk (format: `ID_P[ProjectID]_[ReportID].txt`)
 
 4. **04_MODEL.ipynb**  
    Performs AI-based policy classification:  
@@ -45,7 +45,7 @@ The workflow consists of four main stages:
    - Constructs prompts for the OpenAI API  
    - Scores and classifies each report by policy area  
    - Gathers supporting evidence for classifications  
-   - Saves results as a JSON file (`classification_results_test2.json`) :contentReference[oaicite:10]{index=10}&#8203;:contentReference[oaicite:11]{index=11}
+   - Saves results as a JSON file (`classification_results_test2.json`)
 
 ## File Formats
 
@@ -55,12 +55,12 @@ The workflow consists of four main stages:
 - **Processed text files:** `ID_P101471_44351.txt`  
 - **Universe files:**  
   - Original: `UNIVERSE_Prior_Actions_DESCRIPTION.txt`  
-  - Processed: `UNIVERSE_Prior_Actions_PROCESSED.txt` :contentReference[oaicite:12]{index=12}&#8203;:contentReference[oaicite:13]{index=13}
+  - Processed: `UNIVERSE_Prior_Actions_PROCESSED.txt`
 
 ### Output Files
 
 - **Classification results:** `classification_results_test2.json`  
-- **Validation webpage:** `index.html` :contentReference[oaicite:14]{index=14}&#8203;:contentReference[oaicite:15]{index=15}
+- **Validation webpage:** `index.html`
 
 ## AI Classification Prompt
 
@@ -94,4 +94,4 @@ prompt = (
 
 ## Validation
 
-The results of the classification can be viewed in the included `index.html` file, which provides a web interface for exploring the analysis outcomes. :contentReference[oaicite:18]{index=18}&#8203;:contentReference[oaicite:19]{index=19}
+The results of the classification can be viewed in the included `index.html` file, which provides a web interface for exploring the analysis outcomes.
