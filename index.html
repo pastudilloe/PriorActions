@@ -142,15 +142,15 @@
       container.appendChild(fileNameHeader);
 
       // Description section
-      const descriptionDiv = document.createElement("div");
-      descriptionDiv.className = "section";
-      const descriptionLabel = document.createElement("label");
-      descriptionLabel.textContent = "Description:";
-      descriptionDiv.appendChild(descriptionLabel);
-      const descriptionPara = document.createElement("p");
-      descriptionPara.textContent = result.description || "No description provided.";
-      descriptionDiv.appendChild(descriptionPara);
-      container.appendChild(descriptionDiv);
+      const DescriptionDiv = document.createElement("div");
+      DescriptionDiv.className = "section";
+      const DescriptionLabel = document.createElement("label");
+      DescriptionLabel.textContent = "Description:";
+      DescriptionDiv.appendChild(DescriptionLabel);
+      const DescriptionPara = document.createElement("p");
+      DescriptionPara.textContent = result.Description || "No description provided.";
+      DescriptionDiv.appendChild(DescriptionPara);
+      container.appendChild(DescriptionDiv);
 
       // Overall explanation section
       const explanationDiv = document.createElement("div");
